@@ -5,6 +5,9 @@ const init = async () => {
   const server = Hapi.server({
     port: 9756,
     host: "0.0.0.0",
+    routes: {
+      cors: true //! Remove when in production
+    }
   });
 
   server.route(routes);

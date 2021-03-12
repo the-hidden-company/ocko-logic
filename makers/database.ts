@@ -25,13 +25,32 @@ class Setup {
   });
 }
 
-const get = {};
+const get = {
+  query(query: string): Promise<StatusMessage> {
+    const setup = new Setup();
+    setup.create();
+
+    return new Promise((resolve, reject) => {
+      setup.connection.query(query, (err, result) => {
+        if (err) throw err;
+        else
+          resolve({
+            success: true,
+            status: 200,
+            data: result,
+          });
+      });
+    });
+  },
+};
 
 const set = {
   async query(
     itemArray: any[],
     type: "mista" | "registrace" | "rezervace"
   ): Promise<StatusMessage> {
+    console.log(type);
+
     const setup = new Setup();
     await setup.create();
     itemArray.forEach((itm) => {
@@ -39,7 +58,7 @@ const set = {
       if (type === "mista")
         q = `INSERT INTO \`ockovaci_mista\`(\`misto_id\`, \`misto_nazev\`, \`okres_nuts_kod\`, \`status\`, \`misto_adresa\`, \`latitude\`, \`longitude\`, \`nrpzs_kod\`, \`minimalni_kapacita\`, \`bezbarierovy_pristup\`) VALUES ('${itm.ockovaci_misto_id}','${itm.ockovaci_misto_nazev}','${itm.okres_nuts_kod}',${itm.operacni_status},'${itm.ockovaci_misto_adresa}',${itm.latitude},${itm.longitude},'${itm.nrpzs_kod}',${itm.minimalni_kapacita},${itm.bezbarierovy_pristup})`;
       if (type === "registrace")
-        q = `INSERT INTO \`rezervace\`(\`datum\`, \`misto_id\`, \`misto_nazev\`, \`kraj_nuts_kod\`, \`kraj_nazev\`, \`vekova_skupina\`, \`povolani\`, \`stat\`, \`rezervace\`, \`datum_rezervace\`) VALUES ('${
+        q = `INSERT INTO \`registrace\`(\`datum\`, \`misto_id\`, \`misto_nazev\`, \`kraj_nuts_kod\`, \`kraj_nazev\`, \`vekova_skupina\`, \`povolani\`, \`stat\`, \`rezervace\`, \`datum_rezervace\`) VALUES ('${
           itm.datum
         }', '${itm.ockovaci_misto_id}', '${itm.ockovaci_misto_nazev}', '${
           itm.kraj_nuts_kod
@@ -49,15 +68,7 @@ const set = {
           itm.datum_rezervace ? `'${itm.datum_rezervace}'` : "null"
         })`;
       if (type === "rezervace")
-        q = `INSERT INTO \`rezervace\`(\`datum\`, \`misto_id\`, \`misto_nazev\`, \`kraj_nuts_kod\`, \`kraj_nazev\`, \`vekova_skupina\`, \`povolani\`, \`stat\`, \`rezervace\`, \`datum_rezervace\`) VALUES ('${
-          itm.datum
-        }', '${itm.ockovaci_misto_id}', '${itm.ockovaci_misto_nazev}', '${
-          itm.kraj_nuts_kod
-        }', '${itm.kraj_nazev}','${itm.vekova_skupina}', '${itm.povolani}', '${
-          itm.stat
-        }', ${itm.rezervace}, ${
-          itm.datum_rezervace ? `'${itm.datum_rezervace}'` : "null"
-        })`;
+        q = `INSERT INTO \`rezervace\`(\`datum\`, \`misto_id\`, \`misto_nazev\`, \`kraj_nuts_kod\`, \`kraj_nazev\`, \`volna_kapacita\`, \`maximalni_kapacita\`, \`kalendar_ockovani\`) VALUES ('${itm.datum}', '${itm.ockovaci_misto_id}', '${itm.ockovaci_misto_nazev}', '${itm.kraj_nuts_kod}', '${itm.kraj_nazev}',${itm.volna_kapacita}, ${itm.maximalni_kapacita}, '${itm.kalendar_ockovani}')`;
       setup.connection.query(q, (err, res) => {
         if (err) {
           console.log(err);
