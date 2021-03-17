@@ -2,7 +2,7 @@ import { Request, ResponseToolkit } from "@hapi/hapi"
 import {get} from "../makers/database"
 
 const getMista = async () => {
-    return await get.query("SELECT misto_nazev, latitude, longitude FROM ockovaci_mista")
+    return await get.query("SELECT misto_id, misto_nazev, latitude, longitude FROM ockovaci_mista")
 }
 
 
