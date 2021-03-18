@@ -4,6 +4,8 @@ import mista from "./routes/mista"
 import lide from "./routes/lide"
 import list from "./routes/list"
 import pomer from "./routes/pomer"
+import ockovani from "./routes/ockovani"
+
 
 let routes: Hapi.ServerRoute[];
 
@@ -11,7 +13,9 @@ routes = [
   {
     method: 'GET',
     path: '/',
-    handler: home 
+    handler: () => {
+      return "Welcome!" 
+    } 
   },
   {
     method: 'GET',
@@ -33,7 +37,12 @@ routes = [
     path: '/pomer',
     handler: pomer,
   },
-  
+  {
+    method: 'POST',
+    path: '/ockovani',
+    handler: ockovani
+  }
 ];
 
 export default routes;
+   

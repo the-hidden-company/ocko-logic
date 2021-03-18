@@ -1,6 +1,8 @@
 {
+    
     "compilerOptions": {
-        "outDir": "build"
+        "outDir": "build",
+        "watch": true,
     },
-    "include": ["types/*"]
+    "include": ["types/*", "routes/*", "./routes.ts", "index.ts", "makers/*"],
 }
