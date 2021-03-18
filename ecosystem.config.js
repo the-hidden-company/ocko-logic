@@ -1,8 +1,8 @@
 module.exports = {
   apps : [{
     name: "ocko-logic",
-    script: 'build',
-    watch: 'build'
+    script: 'index.ts',
+    watch: '.'
   }
 ],
 };
