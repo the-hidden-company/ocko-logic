@@ -49,58 +49,8 @@ const get = {
     });
   },
 
-  async pomer(mista: string[], ageGroup: string): Promise<StatusMessage> {
-    const qry = await get.query(
-      `SELECT 
-        misto_nazev, 
-        COUNT(*) as registrace, 
-        COUNT(CASE rezervace WHEN 1 THEN 1 ELSE null END) as rezervace, 
-        COUNT(CASE rezervace WHEN 1 THEN 1 ELSE null END) / COUNT(*) as pomer
-
-      FROM \`registrace\` 
-      WHERE \`vekova_skupina\` = '${ageGroup}'
-        AND \`misto_id\` IN ('${mista.join("', '")}') 
-     GROUP BY \`misto_nazev\``
-    );
-
-    return {
-      success: qry.success,
-      status: qry.status,
-      data: qry.data,
-    };
-  },
-
-  async ockovani(mista: string[], ageGroup: string): Promise<StatusMessage> {
-    const qry = await get.query(`
-      SELECT
-        ockovaci_mista.misto_nazev,
-        COUNT(*) as total,  
-        COUNT(CASE WHEN ockovani.vakcina = "Comirnaty" OR ockovani.vakcina = "COVID-19 Vaccine Moderna" THEN 1 ELSE null END) as mrna, 
-        COUNT(CASE WHEN ockovani.vakcina = "Comirnaty" THEN 1 ELSE null END) as pfizer, 
-        COUNT(CASE WHEN ockovani.vakcina = "COVID-19 Vaccine Moderna" THEN 1 ELSE null END) as moderna, 
-        COUNT(CASE ockovani.vakcina WHEN "COVID-19 Vaccine AstraZeneca" THEN 1 ELSE null END) as astra,
-        COUNT(CASE ockovani.vakcina WHEN "COVID-19 Vaccine AstraZeneca" THEN 1 ELSE null END) 
-            / 
-            COUNT(CASE WHEN ockovani.vakcina = "Comirnaty" OR ockovani.vakcina = "COVID-19 Vaccine Moderna" THEN 1 ELSE null END)
-            as pomer
-      
-      FROM ockovani
-      
-      JOIN ockovaci_mista ON ockovaci_mista.nrpzs_kod = ockovani.misto_kod 
-      
-      WHERE vekova_skupina = '${ageGroup}'
-        AND ockovaci_mista.misto_id IN ('${mista.join("', '")}')
-      
-      GROUP BY ockovaci_mista.misto_nazev  `);
-      
   
-
-    return {
-      success: qry.success,
-      status: qry.status,
-      data: qry.data,
-    };
-  },
+  
 };
 
 const set = {
