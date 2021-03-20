@@ -60,7 +60,7 @@ const get = {
       FROM \`registrace\` 
       WHERE \`vekova_skupina\` = '${ageGroup}'
         AND \`misto_id\` IN ('${mista.join("', '")}') 
-      GROUP BY \`misto_nazev\``
+     GROUP BY \`misto_nazev\``
     );
 
     return {
@@ -72,12 +72,13 @@ const get = {
 
   async ockovani(mista: string[], ageGroup: string): Promise<StatusMessage> {
     const qry = await get.query(`
-      SELECT 
+      SELECT
+        ockovaci_mista.misto_nazev,
         COUNT(*) as total,  
         COUNT(CASE WHEN ockovani.vakcina = "Comirnaty" OR ockovani.vakcina = "COVID-19 Vaccine Moderna" THEN 1 ELSE null END) as mrna, 
-          COUNT(CASE WHEN ockovani.vakcina = "Comirnaty" THEN 1 ELSE null END) as pfizer, 
+        COUNT(CASE WHEN ockovani.vakcina = "Comirnaty" THEN 1 ELSE null END) as pfizer, 
         COUNT(CASE WHEN ockovani.vakcina = "COVID-19 Vaccine Moderna" THEN 1 ELSE null END) as moderna, 
-          COUNT(CASE ockovani.vakcina WHEN "COVID-19 Vaccine AstraZeneca" THEN 1 ELSE null END) as astra,
+        COUNT(CASE ockovani.vakcina WHEN "COVID-19 Vaccine AstraZeneca" THEN 1 ELSE null END) as astra,
         COUNT(CASE ockovani.vakcina WHEN "COVID-19 Vaccine AstraZeneca" THEN 1 ELSE null END) 
             / 
             COUNT(CASE WHEN ockovani.vakcina = "Comirnaty" OR ockovani.vakcina = "COVID-19 Vaccine Moderna" THEN 1 ELSE null END)
@@ -88,7 +89,11 @@ const get = {
       JOIN ockovaci_mista ON ockovaci_mista.nrpzs_kod = ockovani.misto_kod 
       
       WHERE vekova_skupina = '${ageGroup}'
-        AND ockovaci_mista.misto_id IN ('${mista.join("', '")}')`);
+        AND ockovaci_mista.misto_id IN ('${mista.join("', '")}')
+      
+      GROUP BY ockovaci_mista.misto_nazev  `);
+      
+  
 
     return {
       success: qry.success,
@@ -111,7 +116,7 @@ const set = {
       itemArray.forEach((itm, i) => {
         let q: string;
         if (type === "ockovaci_mista")
-          q = `INSERT INTO \`ockovaci_mista\`(\`misto_id\`, \`misto_nazev\`, \`okres_nuts_kod\`, \`status\`, \`misto_adresa\`, \`latitude\`, \`longitude\`, \`nrpzs_kod\`, \`minimalni_kapacita\`, \`bezbarierovy_pristup\`) VALUES ('${itm.ockovaci_misto_id}','${itm.ockovaci_misto_nazev}','${itm.okres_nuts_kod}',${itm.operacni_status},'${itm.ockovaci_misto_adresa}',${itm.latitude},${itm.longitude},'${itm.nrpzs_kod}',${itm.minimalni_kapacita},${itm.bezbarierovy_pristup})`;
+          q = `INSERT INTO \`ockovaci_mista\`(\`misto_id\`, \`misto_nazev\`, \`okres_nuts_kod\`, \`status\`, \`misto_adresa\`, \`latitude\`, \`longitude\`, \`nrpzs_kod\`, \`minimalni_kapacita\`, \`bezbarierovy_pristup\`) VALUES ('${itm.ockovaci_misto_id}','${itm.ockovaci_misto_nazev}','${itm.okres_nuts_kod}',${itm.operacni_status},'${itm.ockovaci_misto_adresa}',${itm.latitude ? itm.latitude : 0},${itm.longitude ? itm.longitude : 0},'${itm.nrpzs_kod}',${itm.minimalni_kapacita},${itm.bezbarierovy_pristup})`;
         if (type === "registrace")
           q = `INSERT INTO \`registrace\`(\`datum\`, \`misto_id\`, \`misto_nazev\`, \`kraj_nuts_kod\`, \`kraj_nazev\`, \`vekova_skupina\`, \`povolani\`, \`stat\`, \`rezervace\`, \`datum_rezervace\`) VALUES ('${
             itm.datum
